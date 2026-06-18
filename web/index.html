@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gametrics · 롤 세이버매트릭스</title>
+<style>
+:root{
+  --bg:#0d1014; --bg2:#141922; --bg3:#1b212c; --line:#283042;
+  --tx:#e6e9ef; --tx2:#9aa4b2; --tx3:#6b7480;
+  --gold:#c8aa6e; --accent:#5b8def;
+  --top:#e8943a; --jungle:#4caf72; --mid:#5b8def; --adc:#e0526b; --support:#b07bd4;
+  --c-econ:#d8a13a; --c-combat:#e0526b; --c-obj:#2bb38a; --c-vision:#5b8def; --c-cc:#9b7be0; --c-tank:#828b99;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',Roboto,'Malgun Gothic',system-ui,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:1040px;margin:0 auto;padding:0 18px}
+header{border-bottom:1px solid var(--line);background:linear-gradient(180deg,#11151c,#0d1014)}
+.hero{padding:34px 0 26px}
+.title{font-size:30px;font-weight:700;letter-spacing:-.5px}
+.title b{color:var(--gold)}
+.sub{color:var(--tx2);margin-top:6px;font-size:15px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.chip{background:var(--bg3);border:1px solid var(--line);border-radius:20px;padding:5px 13px;font-size:12.5px;color:var(--tx2)}
+.chip b{color:var(--tx)}
+.search{margin:22px 0 6px;position:relative}
+.search input{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:15px 17px;color:var(--tx);font-size:16px;outline:none}
+.search input:focus{border-color:var(--accent)}
+.results{position:absolute;left:0;right:0;top:60px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;overflow:hidden;z-index:20;display:none}
+.results div{padding:11px 16px;cursor:pointer;display:flex;justify-content:space-between;border-bottom:1px solid var(--line)}
+.results div:last-child{border:none}
+.results div:hover{background:var(--bg3)}
+.results .rl{color:var(--tx3);font-size:13px}
+section{padding:28px 0}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:24px;display:none;margin-bottom:8px}
+.card.show{display:block}
+.chead{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.pname{font-size:24px;font-weight:700}
+.ptag{color:var(--tx3);font-size:15px;font-weight:400}
+.rolebadge{padding:4px 12px;border-radius:8px;font-size:13px;font-weight:600}
+.champs{color:var(--tx2);font-size:13px;margin-top:3px}
+.prov{margin-left:auto;color:#d9a441;font-size:12.5px;background:#2a2418;border:1px solid #4a3d1f;padding:4px 10px;border-radius:8px}
+.grid{display:grid;grid-template-columns:auto 1fr;gap:26px;margin-top:22px;align-items:center}
+@media(max-width:620px){.grid{grid-template-columns:1fr}}
+.ring{width:128px;height:128px;border-radius:50%;display:grid;place-items:center;position:relative}
+.ring::before{content:'';position:absolute;inset:9px;background:var(--bg2);border-radius:50%}
+.ringv{position:relative;text-align:center}
+.ringv .n{font-size:38px;font-weight:800;line-height:1}
+.ringv .l{font-size:11px;color:var(--tx2);letter-spacing:1px;text-transform:uppercase}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:520px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--bg3);border-radius:10px;padding:12px 14px}
+.stat .v{font-size:21px;font-weight:700}
+.stat .k{font-size:11.5px;color:var(--tx2);margin-top:2px}
+.fp{margin-top:22px}
+.fp .lab{font-size:12px;color:var(--tx2);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase}
+.fpbar{display:flex;height:26px;border-radius:7px;overflow:hidden}
+.fpbar span{display:block}
+.fpleg{display:flex;flex-wrap:wrap;gap:13px;margin-top:10px;font-size:12px;color:var(--tx2)}
+.fpleg i{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:5px;vertical-align:-1px}
+.bd{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:24px}
+@media(max-width:620px){.bd{grid-template-columns:1fr}}
+.bdt{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+.bdt th{font-size:10.5px;padding:5px 7px}
+.bdt td{padding:6px 7px;border-bottom:1px solid #1b2029}
+h2{font-size:19px;font-weight:700;margin-bottom:4px}
+.h2sub{color:var(--tx2);font-size:13.5px;margin-bottom:16px}
+.controls{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.tabs{display:flex;gap:5px;flex-wrap:wrap}
+.tab{background:var(--bg3);border:1px solid var(--line);color:var(--tx2);padding:7px 14px;border-radius:9px;font-size:13px;cursor:pointer}
+.tab.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.sort{margin-left:auto;display:flex;gap:5px;align-items:center;color:var(--tx3);font-size:12.5px}
+.sort button{background:var(--bg3);border:1px solid var(--line);color:var(--tx2);padding:6px 11px;border-radius:8px;font-size:12.5px;cursor:pointer}
+.sort button.on{color:var(--gold);border-color:var(--gold)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;color:var(--tx3);font-weight:500;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;padding:9px 10px;border-bottom:1px solid var(--line)}
+th.sortable{cursor:pointer;user-select:none}
+th.sortable:hover{color:var(--tx2)}
+th.sortable.act{color:var(--gold)}
+.ar{font-size:9px;margin-left:3px}
+td{padding:10px;border-bottom:1px solid #1b2029}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--bg3)}
+.rk{color:var(--tx3);width:38px;font-variant-numeric:tabular-nums}
+.rk.t1{color:var(--gold);font-weight:700}
+.nm{font-weight:600}
+.nm small{color:var(--tx3);font-weight:400}
+.rt{font-size:11.5px;padding:2px 8px;border-radius:6px;font-weight:600}
+.war{font-weight:700;font-variant-numeric:tabular-nums}
+.skl{font-weight:700;font-variant-numeric:tabular-nums}
+.muted{color:var(--tx2);font-variant-numeric:tabular-nums}
+.method{margin-top:10px;color:var(--tx2);font-size:13px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.method summary{cursor:pointer;color:var(--tx);font-weight:600;font-size:14px}
+.method p{margin-top:10px}.method b{color:var(--tx)}
+footer{color:var(--tx3);font-size:12px;text-align:center;padding:30px 0 40px}
+.hint{color:var(--tx3);font-size:13px;margin-top:8px}
+</style>
+</head>
+<body>
+<header><div class="wrap hero">
+  <div class="title">Game<b>trics</b></div>
+  <div class="sub">야구 세이버매트릭스를 리그 오브 레전드로. 머신러닝 기반 선수 가치·실력 통계.</div>
+  <div class="chips" id="chips"></div>
+  <div class="search">
+    <input id="q" type="text" placeholder="소환사 이름으로 검색  (예: Name#KR1)" autocomplete="off">
+    <div class="results" id="res"></div>
+  </div>
+</div></header>
+
+<div class="wrap">
+  <section style="padding-bottom:6px">
+    <div class="card" id="card"></div>
+  </section>
+
+  <section style="padding-top:10px">
+    <h2>리더보드 · Top 100</h2>
+    <div class="h2sub">기본은 WAR(누적 승리기여 가치). 역할 탭으로 좁히고, 정렬 전환 가능.</div>
+    <div class="controls">
+      <div class="tabs" id="tabs"></div>
+    </div>
+    <table><thead><tr>
+      <th>#</th><th>소환사</th><th>역할</th>
+      <th class="sortable" data-s="war">WAR<span class="ar"></span></th>
+      <th class="sortable" data-s="skill">실력<span class="ar"></span></th>
+      <th class="sortable" data-s="games">게임<span class="ar"></span></th>
+      <th class="sortable" data-s="winrate">승률<span class="ar"></span></th>
+      <th>대표 챔프</th>
+    </tr></thead><tbody id="lb"></tbody></table>
+  </section>
+
+  <details class="method"><summary>이 점수는 어떻게 만들어졌나?</summary>
+    <p><b>WAR (Wins Above Replacement)</b> — 분당 게임상태로 승리확률을 예측하는 모델에서 각 행동(골드·킬·오브젝트·시야·CC·탱킹)의 맥락중립 가치를 뽑아, 선수별로 합산하고 '대체 선수' 대비로 환산한 누적 가치. 야구 WAR과 같은 논리.</p>
+    <p><b>실력 (0~100)</b> — 역할 내부에서, 게임당 *반복되는* craft 지표로 매긴 백분위. 서폿은 골드가 아닌 시야·CC로 평가돼 역할별로 공정함. 100 = 해당 역할 최상위.</p>
+    <p><b>한계</b> — 인에이블(시야·CC) 가치 일부는 동료에게 귀속돼 서폿 WAR는 보수적. 단일 패치(16.12) 고티어 표본.</p>
+  </details>
+</div>
+<footer>Gametrics · 데이터: Riot API · 10,000 경기 · 패치 16.12 · 비상업 분석 프로젝트 · Riot Games 공식 콘텐츠 아님</footer>
+
+<script>
+const RC={Top:'var(--top)',Jungle:'var(--jungle)',Mid:'var(--mid)',ADC:'var(--adc)',Support:'var(--support)'};
+const CHC={econ:'var(--c-econ)',combat:'var(--c-combat)',obj:'var(--c-obj)',vision:'var(--c-vision)',cc:'var(--c-cc)',tank:'var(--c-tank)'};
+const CHL={econ:'경제',combat:'전투',obj:'오브젝트',vision:'시야',cc:'CC',tank:'탱킹'};
+const ROLES=['All','Top','Jungle','Mid','ADC','Support'];
+let DATA=null, idx={}, role='All', sortCol='war', sortDir=-1;
+const $=id=>document.getElementById(id);
+
+function tierColor(s){ if(s>=90)return'var(--gold)'; if(s>=75)return'#9b7be0'; if(s>=50)return'var(--accent)'; return'#7a828c'; }
+function roleChip(r){ return `<span class="rt" style="background:${RC[r]}22;color:${RC[r]}">${r}</span>`; }
+
+fetch('data.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{
+  DATA=d;
+  $('chips').innerHTML=[`<span class="chip"><b>${d.meta.players.toLocaleString()}</b> 선수</span>`,
+    `<span class="chip"><b>${d.meta.matches.toLocaleString()}</b> 경기</span>`,
+    `<span class="chip">${d.meta.region}</span>`,`<span class="chip">패치 <b>${d.meta.patch}</b></span>`].join('');
+  d.players.forEach(p=>{ idx[(p.name+'#'+p.tag).toLowerCase()]=p; });
+  $('tabs').innerHTML=ROLES.map(r=>`<button class="tab${r==='All'?' on':''}" data-r="${r}">${r==='All'?'전체':r}</button>`).join('');
+  $('tabs').onclick=e=>{const b=e.target.closest('.tab');if(!b)return;role=b.dataset.r;[...$('tabs').children].forEach(x=>x.classList.toggle('on',x===b));renderLB();};
+  document.querySelector('thead').addEventListener('click',e=>{const th=e.target.closest('.sortable');if(!th)return;const c=th.dataset.s;if(c===sortCol)sortDir=-sortDir;else{sortCol=c;sortDir=-1;}renderLB();});
+  renderLB();
+});
+
+function doLive(name,tag){
+  const card=$('card');card.className='card show';
+  card.innerHTML=`<div style="text-align:center;padding:34px 20px;color:var(--tx2)"><div class="pname" style="font-size:19px">${name} <span class="ptag">#${tag}</span></div><div style="margin-top:16px">최근 16.12 랭크 게임을 분석하는 중… <span style="color:var(--tx3)">(최대 30초)</span></div></div>`;
+  card.scrollIntoView({behavior:'smooth',block:'nearest'});
+  fetch(`/api/evaluate?name=${encodeURIComponent(name)}&tag=${encodeURIComponent(tag)}`)
+   .then(async r=>{if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.detail||'분석 실패');}return r.json();})
+   .then(p=>openPlayer(p))
+   .catch(err=>{card.innerHTML=`<div style="text-align:center;padding:34px 20px;color:#d9728a">${name} #${tag} — ${err.message}</div>`;});
+}
+$('q').addEventListener('input',e=>{
+  const raw=e.target.value.trim(), v=raw.toLowerCase(), res=$('res');
+  if(v.length<2){res.style.display='none';return;}
+  const m=DATA.players.filter(p=>(p.name+'#'+p.tag).toLowerCase().includes(v)).slice(0,7);
+  let html=m.map(p=>`<div data-k="${(p.name+'#'+p.tag).toLowerCase()}"><span>${p.name}<small style="color:var(--tx3)">#${p.tag}</small></span><span class="rl">${p.role} · WAR ${p.war}</span></div>`).join('');
+  const h=raw.indexOf('#');
+  if(h>0){const nm=raw.slice(0,h).trim(),tg=raw.slice(h+1).trim();
+    if(nm&&tg)html+=`<div data-live="1" data-nm="${encodeURIComponent(nm)}" data-tg="${encodeURIComponent(tg)}"><span><b>${nm}</b><small style="color:var(--tx3)">#${tg}</small> 실시간 분석</span><span class="rl" style="color:var(--gold)">미수집 선수 →</span></div>`;}
+  res.innerHTML=html||'<div class="rl" style="cursor:default">로컬에 없음 — <b>이름#태그</b> 전체 입력 시 실시간 분석</div>';
+  res.style.display='block';
+});
+$('res').addEventListener('click',e=>{
+  const live=e.target.closest('[data-live]'), d=e.target.closest('[data-k]');
+  $('res').style.display='none';$('q').value='';
+  if(live)doLive(decodeURIComponent(live.dataset.nm),decodeURIComponent(live.dataset.tg));
+  else if(d)openPlayer(idx[d.dataset.k]);
+});
+$('q').addEventListener('keydown',e=>{
+  if(e.key!=='Enter')return;
+  const raw=e.target.value.trim(),ex=idx[raw.toLowerCase()];$('res').style.display='none';
+  if(ex){openPlayer(ex);return;}
+  const h=raw.indexOf('#');if(h>0){const nm=raw.slice(0,h).trim(),tg=raw.slice(h+1).trim();if(nm&&tg)doLive(nm,tg);}
+});
+document.addEventListener('click',e=>{if(!e.target.closest('.search'))$('res').style.display='none';});
+
+function renderCard(p){
+  if(!p)return;
+  const sc=p.skill, col=sc!=null?tierColor(sc):'#7a828c';
+  const ringPct=sc!=null?sc:0;
+  const fp=Object.keys(p.ch).filter(k=>p.ch[k]>0).map(k=>`<span style="width:${p.ch[k]}%;background:${CHC[k]}" title="${CHL[k]} ${p.ch[k]}%"></span>`).join('');
+  const leg=Object.keys(p.ch).map(k=>`<span><i style="background:${CHC[k]}"></i>${CHL[k]} ${p.ch[k]}%</span>`).join('');
+  const rolesTbl=(p.roles||[]).map(r=>`<tr><td>${roleChip(r.role)}</td><td class="muted">${r.games}</td><td class="war">${r.war}</td><td class="skl" style="color:${r.skill!=null?tierColor(r.skill):'var(--tx3)'}">${r.skill??'–'}</td><td class="muted">${r.winrate}%</td></tr>`).join('');
+  const champTbl=(p.champions||[]).map(c=>`<tr><td class="nm">${c.champion}</td><td>${roleChip(c.role)}</td><td class="muted">${c.games}</td><td class="war">${c.war}</td><td class="muted">${c.winrate}%</td></tr>`).join('');
+  const bd=(p.roles&&p.roles.length)?`<div class="bd"><div><div class="lab">포지션별</div><table class="bdt"><thead><tr><th>역할</th><th>게임</th><th>WAR</th><th>실력</th><th>승률</th></tr></thead><tbody>${rolesTbl}</tbody></table></div><div><div class="lab">챔피언별</div><table class="bdt"><thead><tr><th>챔피언</th><th>역할</th><th>게임</th><th>WAR</th><th>승률</th></tr></thead><tbody>${champTbl}</tbody></table></div></div>`:'';
+  $('card').className='card show';
+  $('card').innerHTML=`
+   <div style="margin-bottom:8px"><span onclick="history.back()" style="cursor:pointer;color:var(--tx2);font-size:13px;user-select:none">← 뒤로</span></div>
+   <div class="chead">
+     <div>
+       <div class="pname">${p.name} <span class="ptag">#${p.tag}</span></div>
+       <div class="champs">${p.champs.join(' · ')||'—'}</div>
+     </div>
+     <span class="rolebadge" style="background:${RC[p.role]}22;color:${RC[p.role]}">${p.role}</span>
+     ${(p.source==='live'||p.source==='cache')?'<span class="rt" style="background:#16241b;color:#6fc28a;border:1px solid #234a30;padding:3px 9px">실시간 분석</span>':''}
+     ${p.prov?'<span class="prov">표본 적음 (&lt;15게임)</span>':''}
+   </div>
+   <div class="grid">
+     <div class="ring" style="background:conic-gradient(${col} ${ringPct*3.6}deg, #222a36 0)">
+       <div class="ringv"><div class="n" style="color:${col}">${sc!=null?sc:'–'}</div><div class="l">실력</div></div>
+     </div>
+     <div class="stats">
+       <div class="stat"><div class="v">${p.war}</div><div class="k">WAR · 전체 #${p.war_rank}</div></div>
+       <div class="stat"><div class="v" style="color:${col}">${sc!=null?sc:'–'}<span style="font-size:13px;color:var(--tx3)">/100</span></div><div class="k">실력 · ${p.role} #${p.skill_rank??'–'}</div></div>
+       <div class="stat"><div class="v">${p.winrate}%</div><div class="k">승률 · ${p.games}게임</div></div>
+       <div class="stat"><div class="v">${p.rate>0?'+':''}${p.rate}</div><div class="k">게임당 기여</div></div>
+     </div>
+   </div>
+   <div class="fp">
+     <div class="lab">가치 구성 (Value fingerprint)</div>
+     <div class="fpbar">${fp}</div>
+     <div class="fpleg">${leg}</div>
+   </div>${bd}`;
+  $('card').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function openPlayer(p){ if(!p)return; renderCard(p); history.pushState({p}, '', '#'+encodeURIComponent((p.name||'')+'-'+(p.tag||''))); }
+function hideCard(){ $('card').className='card'; window.scrollTo({top:0,behavior:'smooth'}); }
+window.addEventListener('popstate', e=>{ if(e.state&&e.state.p) renderCard(e.state.p); else hideCard(); });
+history.replaceState({base:1}, '', location.pathname);
+
+function renderLB(){
+  let rows=DATA.players.slice();
+  if(role!=='All')rows=rows.filter(p=>p.role===role);
+  rows.sort((a,b)=>{const av=a[sortCol]??-Infinity,bv=b[sortCol]??-Infinity;return (av-bv)*sortDir||(b.war-a.war);});
+  rows=rows.slice(0,100);
+  document.querySelectorAll('th.sortable').forEach(th=>{const act=th.dataset.s===sortCol;th.classList.toggle('act',act);th.querySelector('.ar').textContent=act?(sortDir===-1?'▼':'▲'):'';});
+  $('lb').innerHTML=rows.map((p,i)=>`<tr data-k="${(p.name+'#'+p.tag).toLowerCase()}">
+    <td class="rk ${i<3?'t1':''}">${i+1}</td>
+    <td class="nm">${p.name}<small> #${p.tag}</small></td>
+    <td>${roleChip(p.role)}</td>
+    <td class="war">${p.war}</td>
+    <td class="skl" style="color:${p.skill!=null?tierColor(p.skill):'var(--tx3)'}">${p.skill??'–'}</td>
+    <td class="muted">${p.games}</td>
+    <td class="muted">${p.winrate}%</td>
+    <td class="muted" style="color:var(--tx3)">${p.champs.slice(0,2).join(', ')}</td>
+  </tr>`).join('');
+}
+$('lb').addEventListener('click',e=>{const tr=e.target.closest('tr');if(!tr)return;openPlayer(idx[tr.dataset.k]);});
+</script>
+</body>
+</html>

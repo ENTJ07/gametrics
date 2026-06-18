@@ -1,0 +1,22 @@
+# secrets
+.env
+.env.*
+
+# raw data lake — NOT needed for deploy (regenerate via the pipeline)
+data/*.sqlite
+data/*.sqlite-wal
+data/*.sqlite-shm
+data/parsed/
+data/_curve.json
+data/collect.log
+*.parquet
+
+# training models — not needed for deploy (server uses only data/artifacts.joblib)
+data/win_model*.joblib
+
+# kept on purpose (deploy needs these): data/artifacts.joblib, web/data.json
+
+# python
+__pycache__/
+*.pyc
+.venv/

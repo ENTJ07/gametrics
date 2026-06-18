@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: gametrics-api
+    runtime: python
+    plan: free
+    region: singapore
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: RIOT_API_KEY
+        sync: false          # set this secret in the Render dashboard
+      - key: REGION
+        value: asia
+      - key: PLATFORM
+        value: kr
+      - key: PYTHON_VERSION
+        value: "3.12.9"

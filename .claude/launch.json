@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "lolwar",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8753", "--directory", "web", "--bind", "127.0.0.1"],
+      "port": 8753
+    }
+  ]
+}

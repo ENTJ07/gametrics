@@ -1,0 +1,5 @@
+fastapi>=0.110
+uvicorn[standard]>=0.27
+requests>=2.31
+numpy>=1.26
+joblib>=1.3
