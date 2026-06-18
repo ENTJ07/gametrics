@@ -95,11 +95,44 @@ tbody tr:hover{background:var(--bg3)}
 .method p{margin-top:10px}.method b{color:var(--tx)}
 footer{color:var(--tx3);font-size:12px;text-align:center;padding:30px 0 40px}
 .hint{color:var(--tx3);font-size:13px;margin-top:8px}
+.tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media(max-width:560px){
+  .wrap{padding:0 13px}
+  .hero{padding:22px 0 18px}
+  .title{font-size:24px}
+  .sub{font-size:13px}
+  .chips{gap:6px}
+  .chip{padding:4px 10px;font-size:11.5px}
+  .search input{font-size:15px;padding:13px 15px}
+  .results div{padding:12px 14px}
+  h2{font-size:17px}
+  .h2sub{font-size:12.5px}
+  .tab{padding:7px 12px;font-size:12.5px}
+  table{font-size:12.5px}
+  th,td{padding:9px 6px}
+  th:nth-child(6),td:nth-child(6),th:nth-child(8),td:nth-child(8){display:none}
+  .nm small{display:none}
+  .rk{width:26px}
+  .card{padding:18px 15px}
+  .pname{font-size:21px}
+  .ring{width:104px;height:104px}
+  .ring::before{inset:8px}
+  .ringv .n{font-size:31px}
+  .bd{gap:18px;margin-top:20px}
+  .bdt{font-size:11.5px}
+  .bdt th,.bdt td{padding:5px 5px}
+  .fpleg{gap:9px;font-size:11px}
+}
+@media(max-width:380px){
+  .title{font-size:22px}
+  .stat .v{font-size:18px}
+  th,td{padding:8px 5px}
+}
 </style>
 </head>
 <body>
 <header><div class="wrap hero">
-  <div class="title">Game<b>trics</b></div>
+  <div class="title" onclick="goHome()" style="cursor:pointer" title="홈으로">Game<b>trics</b></div>
   <div class="sub">야구 세이버매트릭스를 리그 오브 레전드로. 머신러닝 기반 선수 가치·실력 통계.</div>
   <div class="chips" id="chips"></div>
   <div class="search">
@@ -119,14 +152,14 @@ footer{color:var(--tx3);font-size:12px;text-align:center;padding:30px 0 40px}
     <div class="controls">
       <div class="tabs" id="tabs"></div>
     </div>
-    <table><thead><tr>
+    <div class="tblwrap"><table><thead><tr>
       <th>#</th><th>소환사</th><th>역할</th>
       <th class="sortable" data-s="war">WAR<span class="ar"></span></th>
       <th class="sortable" data-s="skill">실력<span class="ar"></span></th>
       <th class="sortable" data-s="games">게임<span class="ar"></span></th>
       <th class="sortable" data-s="winrate">승률<span class="ar"></span></th>
       <th>대표 챔프</th>
-    </tr></thead><tbody id="lb"></tbody></table>
+    </tr></thead><tbody id="lb"></tbody></table></div>
   </section>
 
   <details class="method"><summary>이 점수는 어떻게 만들어졌나?</summary>
@@ -235,6 +268,7 @@ function renderCard(p){
 }
 function openPlayer(p){ if(!p)return; renderCard(p); history.pushState({p}, '', '#'+encodeURIComponent((p.name||'')+'-'+(p.tag||''))); }
 function hideCard(){ $('card').className='card'; window.scrollTo({top:0,behavior:'smooth'}); }
+function goHome(){ $('card').className='card'; $('q').value=''; $('res').style.display='none'; if(location.hash)history.replaceState({base:1},'',location.pathname); window.scrollTo({top:0,behavior:'smooth'}); }
 window.addEventListener('popstate', e=>{ if(e.state&&e.state.p) renderCard(e.state.p); else hideCard(); });
 history.replaceState({base:1}, '', location.pathname);
 
